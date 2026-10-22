@@ -1,6 +1,6 @@
 {
   "name": "@akshaygpt/cms",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "The content engine behind akshaygpt.com: typed content, derived sections, tag filtering, and drop-a-file image folders.",
   "license": "MIT",
   "author": "Akshay Gupta <hi@akshaygpt.com>",
