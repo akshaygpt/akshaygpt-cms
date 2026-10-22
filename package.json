@@ -1,0 +1,45 @@
+{
+  "name": "@akshaygpt/cms",
+  "version": "0.1.0",
+  "description": "The content engine behind akshaygpt.com: typed content, derived sections, tag filtering, and drop-a-file image folders.",
+  "license": "MIT",
+  "author": "Akshay Gupta <hi@akshaygpt.com>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/akshaygpt/akshaygpt-cms.git"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./fs": {
+      "types": "./dist/fs.d.ts",
+      "default": "./dist/fs.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run typecheck && npm test && npm run build"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "@types/node": "^24.19.2",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.7"
+  }
+}
