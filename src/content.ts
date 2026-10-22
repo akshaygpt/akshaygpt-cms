@@ -19,7 +19,8 @@ export interface Writing<Tag extends string = string, Type extends string = stri
   venue?: string
   excerpt?: string
   featured?: boolean
-  /** Kept off every list while the page stays live for anyone with the link. */
+  /** Kept off every list while the page stays live for anyone with the link.
+   *  A `date` after today does the same until that day comes — see `listed`. */
   hidden?: boolean
 }
 
@@ -64,9 +65,20 @@ export interface Section<
   items: SectionItem<Tag, Kind>[]
 }
 
-/** Everything not marked hidden. */
-export const listed = <T extends { hidden?: boolean }>(entries: T[]): T[] =>
-  entries.filter(e => !e.hidden)
+/** Dated after `today`: written, but not out yet. A 'YYYY/MM' or 'YYYY' date
+ *  counts as out from the first day of that month or year, since a prefix
+ *  sorts before everything it begins. */
+export const isScheduled = (entry: { date?: string }, today: string): boolean =>
+  (entry.date ?? '') > today
+
+/** Everything not marked hidden and not scheduled — pass `today` (from
+ *  `today()`, in the author's zone) and an entry dated later stays off every
+ *  list until then. Without it, dates are not checked. Call it per render, not
+ *  once at module load, or a long-lived server keeps yesterday's answer. */
+export const listed = <T extends { hidden?: boolean; date?: string }>(
+  entries: T[],
+  today?: string,
+): T[] => entries.filter(e => !e.hidden && !(today && isScheduled(e, today)))
 
 /** An entry by the URL it lives at — how a post page reads its own date and
  *  tags back out of the source of truth. Undefined for a page with no entry. */

@@ -35,6 +35,15 @@ const art = withMeta(readDroppedImages('art-i-like'), { 'swan.jpg': { artist: 'H
 Dates are `YYYY/MM/DD` strings (or `YYYY/MM`, `YYYY`) and sort by plain string
 compare.
 
+### Scheduling
+
+A writing dated after today is scheduled: `listed(entries, today('Asia/Kolkata'))`
+leaves it out, along with anything `hidden`, until its day starts in that zone.
+Push it whenever; it comes out on its date. Call `listed` per render rather than
+once at module load, or a server that stays up past midnight keeps yesterday's
+list. `isScheduled(entry, today)` answers the same question for one entry, so a
+post page can mark itself noindex until then.
+
 ## Develop
 
 ```bash

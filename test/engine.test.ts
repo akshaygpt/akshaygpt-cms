@@ -9,10 +9,12 @@ import {
   filterByTag,
   findByHref,
   formatDate,
+  isScheduled,
   listed,
   parseDate,
   splitByVenue,
   tagsOf,
+  today,
   writingToItem,
   type Writing,
 } from '../src'
@@ -57,6 +59,15 @@ describe('tags', () => {
   })
 })
 
+describe('today', () => {
+  it('turns over at midnight in the zone it is given, not in UTC', () => {
+    // 2026-10-22 19:00 UTC is already 00:30 on the 23rd in India.
+    const now = Date.UTC(2026, 9, 22, 19, 0)
+    expect(today('Asia/Kolkata', now)).toBe('2026/10/23')
+    expect(today('UTC', now)).toBe('2026/10/22')
+  })
+})
+
 describe('content', () => {
   it('routes every writing to exactly one list by venue', () => {
     const all = [w({ title: 'a' }), w({ title: 'b', venue: 'Smashing' })]
@@ -69,6 +80,18 @@ describe('content', () => {
     const all = [w({ href: '/a' }), w({ href: '/b', hidden: true })]
     expect(listed(all)).toHaveLength(1)
     expect(findByHref(all, '/b')?.hidden).toBe(true)
+  })
+
+  it('holds back an entry dated after today, and lets it out on the day', () => {
+    const all = [w({ href: '/old', date: '2026/10/22' }), w({ href: '/new', date: '2026/10/23' })]
+    expect(listed(all, '2026/10/22').map(x => x.href)).toEqual(['/old'])
+    expect(listed(all, '2026/10/23')).toHaveLength(2)
+    // No today, no date check — only `hidden` applies.
+    expect(listed(all)).toHaveLength(2)
+    expect(isScheduled(w({ date: '2026/10/23' }), '2026/10/22')).toBe(true)
+    // A month-only date is out from the first of that month.
+    expect(isScheduled(w({ date: '2026/11' }), '2026/10/31')).toBe(true)
+    expect(isScheduled(w({ date: '2026/11' }), '2026/11/01')).toBe(false)
   })
 
   it('keeps `edited` off items and lists an href-less piece as plain text', () => {
