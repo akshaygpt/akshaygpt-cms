@@ -22,3 +22,17 @@ export const toDateString = (ms: number): string => {
 /** Newest first. Undated items sink to the bottom. */
 export const byDateDesc = <T extends { date?: string }>(a: T, b: T): number =>
   (b.date ?? '').localeCompare(a.date ?? '')
+
+/** Today as '2026/10/22', in the given IANA time zone ('Asia/Kolkata', say) or
+ *  the runtime's own when omitted. A server usually runs in UTC, so pass the
+ *  zone the author dates their work in, or a day starts hours late. */
+export const today = (timeZone?: string, now: number = Date.now()): string => {
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).formatToParts(now)
+  const part = (type: string) => parts.find(p => p.type === type)!.value
+  return `${part('year')}/${part('month')}/${part('day')}`
+}
